@@ -1,0 +1,20 @@
+enable
+configure terminal
+hostname R0
+!
+interface gigabitEthernet0/0
+ description TRANSIT_TO_R1
+ ip address 20.0.0.2 255.255.255.252
+ no shutdown
+exit
+!
+interface gigabitEthernet0/1
+ description TRANSIT_TO_R2
+ ip address 30.0.0.2 255.255.255.252
+ no shutdown
+exit
+!
+ip route 192.168.1.0 255.255.255.0 20.0.0.1
+ip route 192.168.2.0 255.255.255.0 30.0.0.1
+end
+write memory

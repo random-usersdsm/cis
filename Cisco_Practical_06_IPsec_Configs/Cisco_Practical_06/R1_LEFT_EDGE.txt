@@ -1,0 +1,40 @@
+enable
+configure terminal
+hostname R1
+!
+interface gigabitEthernet0/1
+ description LAN_TO_PC0_SWITCH
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+exit
+!
+interface gigabitEthernet0/0
+ description WAN_TO_R0_TRANSIT
+ ip address 20.0.0.1 255.255.255.252
+ no shutdown
+exit
+!
+ip route 30.0.0.0 255.255.255.252 20.0.0.2
+ip route 192.168.2.0 255.255.255.0 20.0.0.2
+!
+access-list 100 permit ip 192.168.1.0 0.0.0.255 192.168.2.0 0.0.0.255
+crypto isakmp policy 10
+ encryption aes 256
+ hash sha
+ authentication pre-share
+ group 5
+exit
+crypto isakmp key ismile address 30.0.0.1
+crypto ipsec transform-set R1-R2 esp-aes 256 esp-sha-hmac
+crypto map IPSEC-MAP 10 ipsec-isakmp
+ set peer 30.0.0.1
+ set pfs group5
+ set security-association lifetime seconds 86400
+ set transform-set R1-R2
+ match address 100
+exit
+interface gigabitEthernet0/0
+ crypto map IPSEC-MAP
+exit
+end
+write memory

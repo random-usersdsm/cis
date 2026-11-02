@@ -1,0 +1,63 @@
+PRACTICAL 6 — IPsec SITE-TO-SITE VPN (Packet Tracer)
+
+IMPORTANT
+A native Cisco Packet Tracer .pkt project cannot be generated in this environment.
+This package contains the router CLI configurations and exact topology/address plan.
+Create the topology once in Packet Tracer, then paste each router config.
+
+DEVICES
+- 3 routers: use 1941 or 2911 models (must support crypto/IPsec commands)
+- 2 switches: 2960
+- 2 PCs
+
+CABLE / PORT MAP
+PC0 FastEthernet0 -> SW0 Fa0/1
+SW0 Fa0/2 -> R1 GigabitEthernet0/1
+R1 GigabitEthernet0/0 -> R0 GigabitEthernet0/0
+R0 GigabitEthernet0/1 -> R2 GigabitEthernet0/0
+R2 GigabitEthernet0/1 -> SW1 Fa0/2
+SW1 Fa0/1 -> PC1 FastEthernet0
+
+ADDRESS PLAN
+PC0: 192.168.1.2/24, gateway 192.168.1.1
+R1 G0/1: 192.168.1.1/24
+R1 G0/0: 20.0.0.1/30
+R0 G0/0: 20.0.0.2/30
+R0 G0/1: 30.0.0.2/30
+R2 G0/0: 30.0.0.1/30
+R2 G0/1: 192.168.2.1/24
+PC1: 192.168.2.2/24, gateway 192.168.2.1
+
+CONFIGURATION
+1. Place devices and connect using the port map above.
+2. Set PC0 and PC1 addresses from PC_CONFIGURATION.txt.
+3. Open each router CLI and paste the matching router text file contents.
+4. If Packet Tracer asks for initial configuration dialog, answer "no".
+5. Wait for interfaces to come up (green links).
+
+VERIFY
+On each router:
+  show ip interface brief
+  show ip route
+On R1 and R2:
+  show crypto isakmp sa
+  show crypto ipsec sa
+
+From PC0 command prompt:
+  ping 192.168.2.2
+
+From PC1 command prompt:
+  ping 192.168.1.2
+
+NOTE: The first ping may time out while IKE/IPsec negotiates. Run ping again.
+The tunnel is triggered by traffic matching the ACL between the two LANs.
+
+TROUBLESHOOTING
+- If G0/0 or G0/1 does not exist, use the router's actual interface names and adjust
+  the configuration accordingly (for example, GigabitEthernet0/0/0 on some models).
+- If "crypto isakmp" or "crypto ipsec" commands are rejected, select a Packet Tracer
+  router model/image with IPsec support; not all router models support these commands.
+- Check that the pre-shared key is exactly "ismile" on both VPN endpoints.
+- Check R1 peer 30.0.0.1 and R2 peer 20.0.0.1.
+- Confirm R0 has routes to both LANs and both edge routers have routes to the peer.
+- This is a classroom lab configuration, not a production security template.
